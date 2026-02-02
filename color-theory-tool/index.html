@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Interactive Color Theory Tool</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Quick inline CSS to make swatches visible */
+    #baseColor, #complementColor {
+      width: 50px;
+      height: 50px;
+      border: 1px solid #000;
+    }
+    .swatches {
+      display: flex;
+      gap: 20px;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Explore Color Relationships</h1>
+  <p>Rotate the hue to see how color relationships change.</p>
+
+  <!-- Color Wheel -->
+  <canvas id="colorWheel" width="300" height="300"></canvas>
+
+  <!-- Hue Slider -->
+  <input type="range" min="0" max="360" value="0" id="hueSlider">
+
+  <!-- Color Swatches -->
+  <div class="swatches">
+    <div class="swatch">
+      <p>Base Color</p>
+      <div id="baseColor"></div>
+    </div>
+    <div class="swatch">
+      <p>Complementary</p>
+      <div id="complementColor"></div>
+    </div>
+  </div>
+
+  <h3>Upload an Image</h3>
+  <input type="file" id="imageUpload" accept="image/*">
+
+  <canvas id="imageCanvas" width="300" height="300"></canvas>
+  <p>Click on the image to pick a color</p>
+
+  <!-- Script -->
+  <script src="script.js"></script>
+</body>
+</html>

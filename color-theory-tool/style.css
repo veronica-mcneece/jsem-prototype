@@ -1,0 +1,55 @@
+/* General page styling */
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background: #f5f5f5;
+  margin: 0;
+  padding: 20px;
+}
+
+/* All canvases centered with margin */
+canvas {
+  display: block;
+  margin: 20px auto;
+  background: #fff; /* optional: makes the canvas visible */
+}
+
+/* Color swatches container */
+.swatches {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 20px;
+}
+
+/* Individual swatch box */
+.swatch div {
+  width: 100px;
+  height: 100px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  display: inline-block;
+  background: #ffffff; /* ensures initial color shows */
+}
+
+/* Image canvas styling */
+#imageCanvas {
+  margin-top: 20px;
+  border: 1px solid #ccc;
+  cursor: crosshair;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  background: #fff; /* optional: makes empty canvas visible */
+}
+
+/* Input slider styling */
+input[type="range"] {
+  width: 300px;
+  margin: 20px 0;
+}
+
+/* Headings spacing */
+h1, h3, p {
+  margin: 10px 0;
+}

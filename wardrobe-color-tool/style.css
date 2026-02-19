@@ -167,3 +167,21 @@ button:active {
     font-size: 2rem;
   }
 }
+.meter-container {
+  margin-top: 20px;
+}
+
+.meter {
+  background: #eee;
+  border-radius: 20px;
+  height: 14px;
+  margin: 6px 0 15px;
+  overflow: hidden;
+}
+
+.meter div {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #ff6ec7, #6c63ff);
+  transition: width 0.4s ease;
+}

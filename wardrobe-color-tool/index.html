@@ -3,11 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Wardrobe Color Pairing Tool</title>
+  <title>Wardrobe Matchmaker AI</title>
 
-  <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-
   <link rel="stylesheet" href="style.css" />
 </head>
 
@@ -15,57 +13,68 @@
 
   <div class="app-container">
 
-    <!-- HEADER -->
-    <header class="app-header">
-      <h1>🎀 Wardrobe Matchmaker</h1>
+    <header>
+      <h1>🎀 Wardrobe Matchmaker AI</h1>
       <p class="subtitle">
-        Intelligent color pairing based on real color theory.
+        AI-driven color harmony, aesthetic intelligence, and climate awareness.
       </p>
     </header>
 
-    <!-- ADD ITEM -->
-    <section class="card add-card">
-      <h2>🧺 Add to Your Wardrobe</h2>
+    <section class="card">
+      <h2>Add Garment</h2>
 
-      <div class="form-group">
-        <label>Upload Garment Image</label>
-        <input type="file" id="imageInput" accept="image/*" />
-      </div>
+      <input type="file" id="imageInput" accept="image/*" />
 
-      <div class="form-group">
-        <label>Garment Type</label>
-        <select id="garmentType">
-          <option value="top">Top</option>
-          <option value="bottom">Bottom</option>
-          <option value="outerwear">Outerwear</option>
-          <option value="shoes">Shoes</option>
-        </select>
-      </div>
+      <select id="garmentType">
+        <option value="top">Top</option>
+        <option value="bottom">Bottom</option>
+        <option value="outerwear">Outerwear</option>
+        <option value="shoes">Shoes</option>
+      </select>
 
-      <button id="addButton" class="primary-btn">
-        Add to Wardrobe ✨
-      </button>
+      <button id="addButton">Add</button>
     </section>
 
-    <!-- WARDROBE DISPLAY -->
-    <section class="card wardrobe-card">
-      <div class="section-header">
-        <h2>👗 Your Wardrobe</h2>
-        <span class="item-count">Curated pieces</span>
-      </div>
+    <section class="card">
+      <h2>Environment</h2>
 
+      <input type="number" id="temperatureInput" placeholder="Temperature °F" />
+
+      <select id="aestheticMode">
+        <option value="balanced">Balanced</option>
+        <option value="minimalist">Minimalist</option>
+        <option value="bold">Bold</option>
+        <option value="neutral">Neutral</option>
+      </select>
+    </section>
+
+    <section class="card">
+      <h2>Your Wardrobe</h2>
       <div id="wardrobeDisplay" class="wardrobe-grid"></div>
     </section>
 
-    <!-- PAIRING -->
-    <section class="card pairing-card">
-      <h2>💖 Suggested Pairing</h2>
+    <section class="card">
+      <h2>Generate Outfit</h2>
+      <button id="pairButton">Generate Look</button>
 
-      <button id="pairButton" class="secondary-btn">
-        Generate Look
-      </button>
+      <div id="pairingResult"></div>
 
-      <div id="pairingResult" class="pairing-result"></div>
+      <div class="meter-container">
+        <div>
+          Harmony
+          <div class="meter"><div id="harmonyMeter"></div></div>
+        </div>
+
+        <div>
+          Contrast
+          <div class="meter"><div id="contrastMeter"></div></div>
+        </div>
+
+        <div>
+          Temperature Fit
+          <div class="meter"><div id="climateMeter"></div></div>
+        </div>
+      </div>
     </section>
 
   </div>

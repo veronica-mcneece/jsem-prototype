@@ -39,7 +39,7 @@ addButton.addEventListener("click", () => {
   reader.readAsDataURL(file);
 });
 
-// -------------------- AI DOMINANT COLOR (K-MEANS LIGHT VERSION) --------------------
+// -------------------- DOMINANT COLOR --------------------
 
 function extractDominantColor(img) {
   const canvas = document.createElement("canvas");
@@ -56,28 +56,18 @@ function extractDominantColor(img) {
     pixels.push([data[i], data[i + 1], data[i + 2]]);
   }
 
-  let centroid = pixels[Math.floor(Math.random() * pixels.length)];
+  let r = 0, g = 0, b = 0;
 
-  for (let iteration = 0; iteration < 5; iteration++) {
-    let r = 0, g = 0, b = 0;
-
-    pixels.forEach(p => {
-      r += p[0];
-      g += p[1];
-      b += p[2];
-    });
-
-    centroid = [
-      r / pixels.length,
-      g / pixels.length,
-      b / pixels.length
-    ];
-  }
+  pixels.forEach(p => {
+    r += p[0];
+    g += p[1];
+    b += p[2];
+  });
 
   return {
-    r: Math.round(centroid[0]),
-    g: Math.round(centroid[1]),
-    b: Math.round(centroid[2])
+    r: Math.round(r / pixels.length),
+    g: Math.round(g / pixels.length),
+    b: Math.round(b / pixels.length)
   };
 }
 
@@ -101,26 +91,36 @@ function displayWardrobe() {
 // -------------------- PAIRING --------------------
 
 pairButton.addEventListener("click", () => {
-  if (wardrobe.length < 2) return alert("Add at least two garments.");
+  if (wardrobe.length < 2) {
+    return alert("Add at least two garments.");
+  }
 
   const temp = parseInt(temperatureInput.value);
   const mode = aestheticMode.value;
 
-  const filtered = wardrobe.filter(item => climateFilter(item, temp));
+  const climateFiltered = wardrobe.filter(item =>
+    climateFilter(item, temp)
+  );
 
-  if (filtered.length < 2) {
-    return alert("Not enough climate appropriate garments.");
+  let selectionPool = climateFiltered;
+  let climateMessage = "";
+
+  // Graceful fallback if climate filter reduces options too much
+  if (climateFiltered.length < 2) {
+    selectionPool = wardrobe;
+    climateMessage =
+      "Outfit generated using full wardrobe selection for balance.";
   }
 
-  const base = filtered[0];
-  const candidate = filtered[1];
+  const base = selectionPool[0];
+  const candidate = selectionPool[1];
 
-  generateOutfit(base, candidate, temp, mode);
+  generateOutfit(base, candidate, temp, mode, climateMessage);
 });
 
 // -------------------- OUTFIT LOGIC --------------------
 
-function generateOutfit(a, b, temp, mode) {
+function generateOutfit(a, b, temp, mode, climateMessage = "") {
   const aHSL = rgbToHsl(a.color);
   const bHSL = rgbToHsl(b.color);
 
@@ -128,7 +128,6 @@ function generateOutfit(a, b, temp, mode) {
   const lightDiff = Math.abs(aHSL.l - bHSL.l);
 
   let harmonyScore = 0;
-  let contrastScore = 0;
 
   if (mode === "minimalist") {
     harmonyScore = 100 - hueDiff;
@@ -140,8 +139,7 @@ function generateOutfit(a, b, temp, mode) {
     harmonyScore = 100 - Math.abs(90 - hueDiff);
   }
 
-  contrastScore = lightDiff * 100;
-
+  const contrastScore = lightDiff * 100;
   const climateScore = climateScoreCalc(temp, a, b);
 
   updateMeter("harmonyMeter", harmonyScore);
@@ -151,12 +149,13 @@ function generateOutfit(a, b, temp, mode) {
   pairingResult.innerHTML = `
     <strong>${a.label} works with ${b.label}</strong>
     <p>
-      Their hue difference of ${Math.round(hueDiff)}° creates 
-      ${mode} harmony.
+      Hue difference of ${Math.round(hueDiff)}° supports a 
+      ${mode} aesthetic.
     </p>
     <p>
-      The ${a.label} supports the ${b.label} without visual conflict.
+      The pairing maintains visual balance and cohesion.
     </p>
+    ${climateMessage ? `<p style="opacity:0.7;">${climateMessage}</p>` : ""}
   `;
 }
 
@@ -164,48 +163,69 @@ function generateOutfit(a, b, temp, mode) {
 
 function updateMeter(id, value) {
   const meter = document.getElementById(id);
-  meter.style.width = Math.min(value, 100) + "%";
+  meter.style.width = Math.min(Math.max(value, 0), 100) + "%";
 }
 
 // -------------------- COLOR UTILS --------------------
 
 function rgbToHsl({ r, g, b }) {
-  r /= 255; g /= 255; b /= 255;
-  const max = Math.max(r,g,b);
-  const min = Math.min(r,g,b);
-  let h=0,s,l=(max+min)/2;
+  r /= 255;
+  g /= 255;
+  b /= 255;
 
-  if(max!==min){
-    const d=max-min;
-    s=l>0.5?d/(2-max-min):d/(max+min);
-    switch(max){
-      case r:h=(g-b)/d;break;
-      case g:h=(b-r)/d+2;break;
-      case b:h=(r-g)/d+4;break;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0;
+  let s = 0;
+  const l = (max + min) / 2;
+
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+    switch (max) {
+      case r:
+        h = (g - b) / d;
+        break;
+      case g:
+        h = (b - r) / d + 2;
+        break;
+      case b:
+        h = (r - g) / d + 4;
+        break;
     }
-    h*=60;
+
+    h *= 60;
   }
-  return {h,s,l};
+
+  return { h, s, l };
 }
 
 // -------------------- CLIMATE --------------------
 
-function assignWarmth(type){
-  if(type==="outerwear") return "warm";
-  if(type==="top") return "medium";
+function assignWarmth(type) {
+  if (type === "outerwear") return "warm";
+  if (type === "top") return "medium";
   return "light";
 }
 
-function climateFilter(item,temp){
-  if(isNaN(temp)) return true;
-  if(temp>=70 && item.warmth==="warm") return false;
-  if(temp<=40 && item.warmth==="light") return false;
+function climateFilter(item, temp) {
+  if (isNaN(temp)) return true;
+
+  if (temp >= 70 && item.warmth === "warm") return false;
+  if (temp <= 40 && item.warmth === "light") return false;
+
   return true;
 }
 
-function climateScoreCalc(temp,a,b){
-  if(isNaN(temp)) return 50;
-  if(temp>=70 && (a.warmth==="warm"||b.warmth==="warm")) return 20;
-  if(temp<=40 && (a.warmth==="light"||b.warmth==="light")) return 20;
+function climateScoreCalc(temp, a, b) {
+  if (isNaN(temp)) return 50;
+
+  if (temp >= 70 && (a.warmth === "warm" || b.warmth === "warm"))
+    return 40;
+
+  if (temp <= 40 && (a.warmth === "light" || b.warmth === "light"))
+    return 40;
+
   return 100;
 }

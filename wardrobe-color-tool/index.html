@@ -79,6 +79,57 @@
 
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    // Prompt user for a username once per session
+    let username = localStorage.getItem('wardrobeUser');
+    if (!username) {
+      username = prompt("Enter your username:");
+      if (!username) username = "guest";
+      localStorage.setItem('wardrobeUser', username);
+    }
+
+    const addButton = document.getElementById('addButton');
+    const imageInput = document.getElementById('imageInput');
+    const garmentType = document.getElementById('garmentType');
+    const wardrobeDisplay = document.getElementById('wardrobeDisplay');
+
+    // Load user's wardrobe from localStorage
+    let wardrobe = JSON.parse(localStorage.getItem(`wardrobe_${username}`)) || [];
+
+    function renderWardrobe() {
+      wardrobeDisplay.innerHTML = '';
+      wardrobe.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'wardrobe-item';
+        div.innerHTML = `<strong>${item.type}</strong><br><img src="${item.img}" alt="${item.type}" width="80">`;
+        wardrobeDisplay.appendChild(div);
+      });
+    }
+
+    renderWardrobe();
+
+    addButton.addEventListener('click', () => {
+      const file = imageInput.files[0];
+      if (!file) return alert("Please select an image.");
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const imgData = e.target.result;
+        wardrobe.push({ type: garmentType.value, img: imgData });
+        localStorage.setItem(`wardrobe_${username}`, JSON.stringify(wardrobe));
+        renderWardrobe();
+        imageInput.value = ''; // reset input
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Pairing logic placeholder
+    const pairButton = document.getElementById('pairButton');
+    const pairingResult = document.getElementById('pairingResult');
+    pairButton.addEventListener('click', () => {
+      if (!wardrobe.length) return alert("Add some garments first!");
+      pairingResult.textContent = "🎉 Outfit generated (mock logic)";
+    });
+  </script>
 </body>
 </html>

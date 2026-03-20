@@ -1,3 +1,6 @@
+// -------------------- STATE --------------------
+
+let wardrobe = JSON.parse(localStorage.getItem("wardrobe")) || [];
 
 // -------------------- ADD GARMENT --------------------
 
@@ -12,16 +15,18 @@ addButton.addEventListener("click", () => {
     img.src = reader.result;
 
     img.onload = () => {
-      const dominantColor = extractDominantColor(img);
+      const color = extractDominantColor(img);
 
-      wardrobe.push({
+      const item = {
         image: reader.result,
         type: garmentTypeSelect.value,
         warmth: assignWarmth(garmentTypeSelect.value),
         label: garmentTypeSelect.value,
-        color: dominantColor
-      });
+        color: color
+      };
 
+      wardrobe.push(item);
+      saveWardrobe();
       displayWardrobe();
     };
   };
@@ -29,7 +34,7 @@ addButton.addEventListener("click", () => {
   reader.readAsDataURL(file);
 });
 
-// -------------------- DOMINANT COLOR --------------------
+// -------------------- COLOR DETECTION --------------------
 
 function extractDominantColor(img) {
   const canvas = document.createElement("canvas");
@@ -40,25 +45,23 @@ function extractDominantColor(img) {
   ctx.drawImage(img, 0, 0, 80, 80);
 
   const data = ctx.getImageData(0, 0, 80, 80).data;
-  const pixels = [];
+  const buckets = {};
 
   for (let i = 0; i < data.length; i += 16) {
-    pixels.push([data[i], data[i + 1], data[i + 2]]);
+    const r = Math.round(data[i] / 32) * 32;
+    const g = Math.round(data[i + 1] / 32) * 32;
+    const b = Math.round(data[i + 2] / 32) * 32;
+
+    const key = `${r},${g},${b}`;
+    buckets[key] = (buckets[key] || 0) + 1;
   }
 
-  let r = 0, g = 0, b = 0;
+  const dominant = Object.keys(buckets).reduce((a, b) =>
+    buckets[a] > buckets[b] ? a : b
+  );
 
-  pixels.forEach(p => {
-    r += p[0];
-    g += p[1];
-    b += p[2];
-  });
-
-  return {
-    r: Math.round(r / pixels.length),
-    g: Math.round(g / pixels.length),
-    b: Math.round(b / pixels.length)
-  };
+  const [r, g, b] = dominant.split(",").map(Number);
+  return { r, g, b };
 }
 
 // -------------------- DISPLAY --------------------
@@ -72,81 +75,143 @@ function displayWardrobe() {
 
     const img = document.createElement("img");
     img.src = item.image;
+    img.width = 80;
+
+    const dot = document.createElement("div");
+    dot.style.width = "12px";
+    dot.style.height = "12px";
+    dot.style.borderRadius = "50%";
+    dot.style.background = `rgb(${item.color.r}, ${item.color.g}, ${item.color.b})`;
+    dot.style.marginTop = "5px";
 
     div.appendChild(img);
+    div.appendChild(dot);
+
     wardrobeDisplay.appendChild(div);
   });
 }
 
-// -------------------- PAIRING --------------------
+// -------------------- GENERATE OUTFIT --------------------
 
 pairButton.addEventListener("click", () => {
+  const temp = parseInt(temperatureInput.value);
+  const mode = aestheticMode.value;
+
   if (wardrobe.length < 2) {
     return alert("Add at least two garments.");
   }
 
-  const temp = parseInt(temperatureInput.value);
-  const mode = aestheticMode.value;
+  let tops = wardrobe.filter(i => i.type === "top");
+  let bottoms = wardrobe.filter(i => i.type === "bottom");
 
-  const climateFiltered = wardrobe.filter(item =>
-    climateFilter(item, temp)
-  );
-
-  let selectionPool = climateFiltered;
-  let climateMessage = "";
-
-  // Graceful fallback if climate filter reduces options too much
-  if (climateFiltered.length < 2) {
-    selectionPool = wardrobe;
-    climateMessage =
-      "Outfit generated using full wardrobe selection for balance.";
+  if (!tops.length || !bottoms.length) {
+    pairingResult.textContent = "Need at least one top and one bottom.";
+    return;
   }
 
-  const base = selectionPool[0];
-  const candidate = selectionPool[1];
+  // Temperature filtering
+  tops = tops.filter(t => climateFilter(t, temp));
+  bottoms = bottoms.filter(b => climateFilter(b, temp));
 
-  generateOutfit(base, candidate, temp, mode, climateMessage);
+  if (!tops.length || !bottoms.length) {
+    pairingResult.textContent = "No suitable outfit for this temperature.";
+    return;
+  }
+
+  let best = null;
+  let bestScore = -Infinity;
+
+  tops.forEach(top => {
+    bottoms.forEach(bottom => {
+      const score = scoreOutfit(top, bottom, temp, mode);
+      if (score > bestScore) {
+        bestScore = score;
+        best = { top, bottom };
+      }
+    });
+  });
+
+  displayOutfit(best.top, best.bottom, temp, mode);
 });
 
-// -------------------- OUTFIT LOGIC --------------------
+// -------------------- SCORING --------------------
 
-function generateOutfit(a, b, temp, mode, climateMessage = "") {
-  const aHSL = rgbToHsl(a.color);
-  const bHSL = rgbToHsl(b.color);
+function scoreOutfit(top, bottom, temp, mode) {
+  const a = rgbToHsl(top.color);
+  const b = rgbToHsl(bottom.color);
 
-  const hueDiff = Math.abs(aHSL.h - bHSL.h);
-  const lightDiff = Math.abs(aHSL.l - bHSL.l);
+  const hueDiff = Math.abs(a.h - b.h);
+  const lightDiff = Math.abs(a.l - b.l);
+  const satDiff = Math.abs(a.s - b.s);
 
-  let harmonyScore = 0;
+  let harmony = 0;
 
-  if (mode === "minimalist") {
-    harmonyScore = 100 - hueDiff;
-  } else if (mode === "bold") {
-    harmonyScore = hueDiff;
+  const complementary = Math.abs(180 - hueDiff);
+  const analogous = Math.min(hueDiff, 360 - hueDiff);
+
+  if (mode === "bold") {
+    harmony = 100 - complementary;
+  } else if (mode === "minimalist") {
+    harmony = 100 - analogous;
   } else if (mode === "neutral") {
-    harmonyScore = 100 - Math.abs(aHSL.s - bHSL.s) * 100;
+    harmony = 100 - satDiff * 100;
   } else {
-    harmonyScore = 100 - Math.abs(90 - hueDiff);
+    harmony = 100 - Math.min(complementary, analogous);
   }
 
-  const contrastScore = lightDiff * 100;
-  const climateScore = climateScoreCalc(temp, a, b);
+  const contrast = lightDiff * 100;
+  const climate = climateScoreCalc(temp, top, bottom);
 
-  updateMeter("harmonyMeter", harmonyScore);
-  updateMeter("contrastMeter", contrastScore);
-  updateMeter("climateMeter", climateScore);
+  return harmony * 0.5 + contrast * 0.2 + climate * 0.3;
+}
+
+// -------------------- DISPLAY OUTFIT --------------------
+
+function displayOutfit(top, bottom, temp, mode) {
+  const a = rgbToHsl(top.color);
+  const b = rgbToHsl(bottom.color);
+
+  const hueDiff = Math.abs(a.h - b.h);
+  const lightDiff = Math.abs(a.l - b.l);
+
+  const harmony = 100 - Math.min(Math.abs(180 - hueDiff), hueDiff);
+  const contrast = lightDiff * 100;
+  const climate = climateScoreCalc(temp, top, bottom);
+
+  updateMeter("harmonyMeter", harmony);
+  updateMeter("contrastMeter", contrast);
+  updateMeter("climateMeter", climate);
+
+  const explanation = getExplanation(mode);
 
   pairingResult.innerHTML = `
-    <strong>${a.label} works with ${b.label}</strong>
-    <p>
-      Hue difference of ${Math.round(hueDiff)}° supports a 
-      ${mode} aesthetic.
-    </p>
-    <p>
-      The pairing maintains visual balance and cohesion.
-    </p>
-    ${climateMessage ? `<p style="opacity:0.7;">${climateMessage}</p>` : ""}
+    <div style="display:flex; gap:20px;">
+      <div>
+        <h3>Top</h3>
+        <img src="${top.image}" width="100">
+      </div>
+      <div>
+        <h3>Bottom</h3>
+        <img src="${bottom.image}" width="100">
+      </div>
+    </div>
+
+    <p><strong>Why it works:</strong> ${explanation}</p>
+    <p>Hue difference: ${Math.round(hueDiff)}°</p>
   `;
+}
+
+function getExplanation(mode) {
+  if (mode === "bold") {
+    return "Uses complementary colors for strong contrast.";
+  }
+  if (mode === "minimalist") {
+    return "Uses similar tones for a clean aesthetic.";
+  }
+  if (mode === "neutral") {
+    return "Balances soft, low-saturation colors.";
+  }
+  return "Balances contrast and harmony for everyday style.";
 }
 
 // -------------------- METERS --------------------
@@ -165,8 +230,8 @@ function rgbToHsl({ r, g, b }) {
 
   const max = Math.max(r, g, b);
   const min = Math.min(r, g, b);
-  let h = 0;
-  let s = 0;
+
+  let h = 0, s = 0;
   const l = (max + min) / 2;
 
   if (max !== min) {
@@ -174,15 +239,9 @@ function rgbToHsl({ r, g, b }) {
     s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
 
     switch (max) {
-      case r:
-        h = (g - b) / d;
-        break;
-      case g:
-        h = (b - r) / d + 2;
-        break;
-      case b:
-        h = (r - g) / d + 4;
-        break;
+      case r: h = (g - b) / d; break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
     }
 
     h *= 60;
@@ -219,114 +278,13 @@ function climateScoreCalc(temp, a, b) {
 
   return 100;
 }
-// -------------------- SMART OUTFIT GENERATOR --------------------
 
-pairButton.addEventListener("click", () => {
-  const temp = parseInt(temperatureInput.value);
-  const mode = aestheticMode.value;
+// -------------------- STORAGE --------------------
 
-  if (!wardrobe.length) return alert("Add some garments first!");
-  if (isNaN(temp)) return alert("Enter a temperature.");
-
-  // Separate tops and bottoms
-  let tops = wardrobe.filter(item => item.type === "top");
-  let bottoms = wardrobe.filter(item => item.type === "bottom");
-
-  // Temperature-based filtering
-  if (temp < 40) {
-    tops = tops.filter(t => !t.label.toLowerCase().includes("tank"));
-    bottoms = bottoms.filter(b => !b.label.toLowerCase().includes("short") && !b.label.toLowerCase().includes("skirt"));
-  } else if (temp > 75) {
-    tops = tops.filter(t => !t.label.toLowerCase().includes("sweater") && !t.label.toLowerCase().includes("hoodie"));
-  }
-
-  if (!tops.length || !bottoms.length) {
-    pairingResult.textContent = "No suitable outfit found for this temperature. ❄️☀️";
-    return;
-  }
-
-  // Score all possible top-bottom pairs
-  let bestOutfit = null;
-  let bestScore = -Infinity;
-
-  tops.forEach(top => {
-    bottoms.forEach(bottom => {
-      const score = scoreOutfit(top, bottom, temp, mode);
-      if (score > bestScore) {
-        bestScore = score;
-        bestOutfit = { top, bottom };
-      }
-    });
-  });
-
-  if (!bestOutfit) {
-    pairingResult.textContent = "Couldn't generate an outfit based on your wardrobe.";
-    return;
-  }
-
-  // Display the best outfit
-  displayOutfit(bestOutfit.top, bestOutfit.bottom, temp, mode);
-});
-
-// -------------------- SCORING FUNCTION --------------------
-
-function scoreOutfit(top, bottom, temp, mode) {
-  const aHSL = rgbToHsl(top.color);
-  const bHSL = rgbToHsl(bottom.color);
-
-  const hueDiff = Math.abs(aHSL.h - bHSL.h);
-  const lightDiff = Math.abs(aHSL.l - bHSL.l);
-
-  let harmonyScore = 0;
-  if (mode === "minimalist") {
-    harmonyScore = 100 - hueDiff;
-  } else if (mode === "bold") {
-    harmonyScore = hueDiff;
-  } else if (mode === "neutral") {
-    harmonyScore = 100 - Math.abs(aHSL.s - bHSL.s) * 100;
-  } else {
-    harmonyScore = 100 - Math.abs(90 - hueDiff);
-  }
-
-  const contrastScore = lightDiff * 100;
-  const climateScore = climateScoreCalc(temp, top, bottom);
-
-  // Total score: weighted sum of harmony, contrast, climate
-  const totalScore = harmonyScore * 0.5 + contrastScore * 0.2 + climateScore * 0.3;
-  return totalScore;
+function saveWardrobe() {
+  localStorage.setItem("wardrobe", JSON.stringify(wardrobe));
 }
 
-// -------------------- DISPLAY FUNCTION --------------------
+// -------------------- INIT --------------------
 
-function displayOutfit(top, bottom, temp, mode) {
-  const aHSL = rgbToHsl(top.color);
-  const bHSL = rgbToHsl(bottom.color);
-
-  const hueDiff = Math.abs(aHSL.h - bHSL.h);
-  const lightDiff = Math.abs(aHSL.l - bHSL.l);
-
-  const climateScore = climateScoreCalc(temp, top, bottom);
-  const contrastScore = lightDiff * 100;
-  let harmonyScore = 0;
-  if (mode === "minimalist") {
-    harmonyScore = 100 - hueDiff;
-  } else if (mode === "bold") {
-    harmonyScore = hueDiff;
-  } else if (mode === "neutral") {
-    harmonyScore = 100 - Math.abs(aHSL.s - bHSL.s) * 100;
-  } else {
-    harmonyScore = 100 - Math.abs(90 - hueDiff);
-  }
-
-  updateMeter("harmonyMeter", harmonyScore);
-  updateMeter("contrastMeter", contrastScore);
-  updateMeter("climateMeter", climateScore);
-
-  pairingResult.innerHTML = `
-    <h3>Top:</h3><img src="${top.image}" width="100">
-    <h3>Bottom:</h3><img src="${bottom.image}" width="100">
-    <p>Hue difference: ${Math.round(hueDiff)}°</p>
-    <p>Contrast: ${Math.round(contrastScore)} / Climate Fit: ${climateScore}</p>
-    <p>Aesthetic Mode: ${mode}</p>
-  `;
-}
+displayWardrobe();

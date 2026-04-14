@@ -26,19 +26,22 @@ No downloads or setup are required.
 ### Step 1: Open the Website
 Navigate to:
 https://huecloset.netlify.app/
+<img width="779" height="532" alt="Homepage" src="https://github.com/user-attachments/assets/d5a5d47c-f16a-4ab3-94f8-03de746f381f" />
 
 ---
 
 ### Step 2: Upload Clothing Items
 - Upload images of clothing items (e.g., shirts, pants, jackets)
 - Supported formats: `.jpg`, `.png`, `.webp`
-![alt text](<../Screenshots/Screenshot 2026-04-14 at 5.50.33 PM.png>)
----
+<img width="858" height="436" alt="Bottom Selection" src="https://github.com/user-attachments/assets/edefff3e-7653-4085-b80c-ac94d82bea38" />
+<img width="858" height="429" alt="Shirt Selection" src="https://github.com/user-attachments/assets/1378f1ae-a028-4f4a-b244-5a722d3fdf41" />
+
 
 ### Step 3: Input Temperature
 - Enter the current or desired temperature
 - This helps the system filter appropriate clothing items
-![alt text](<../Screenshots/Screenshot 2026-04-14 at 5.52.01 PM.png>)
+<img width="786" height="255" alt="Environment" src="https://github.com/user-attachments/assets/0c315570-13a8-49b6-b1f5-04640639d844" />
+
 ---
 
 ### Step 4: Generate Outfits
@@ -47,8 +50,8 @@ https://huecloset.netlify.app/
   - Extract dominant colors from each clothing item
   - Filter items based on temperature suitability
   - Rank outfit combinations based on color compatibility
-![alt text](<../Screenshots/Screenshot 2026-04-14 at 5.52.49 PM.png>)
----
+
+<img width="776" height="665" alt="Wardrobe" src="https://github.com/user-attachments/assets/8b75cbfc-5f5c-4f35-a002-2ba1906dabb4" />
 
 ### Step 5: View Results
 - The system displays recommended outfits
@@ -56,7 +59,8 @@ https://huecloset.netlify.app/
   - Selected clothing items
   - A score indicating quality
   - A brief explanation (color harmony + weather suitability)
-![alt text](<../Screenshots/Screenshot 2026-04-14 at 5.52.39 PM.png>)
+<img width="899" height="214" alt="Generation result" src="https://github.com/user-attachments/assets/47051a0c-ec84-4cdd-8c13-38c576f21aa9" />
+
 ---
 
 ## Example Workflow

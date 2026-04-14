@@ -32,13 +32,13 @@ https://huecloset.netlify.app/
 ### Step 2: Upload Clothing Items
 - Upload images of clothing items (e.g., shirts, pants, jackets)
 - Supported formats: `.jpg`, `.png`, `.webp`
-
+![alt text](<../Screenshots/Screenshot 2026-04-14 at 5.50.33 PM.png>)
 ---
 
 ### Step 3: Input Temperature
 - Enter the current or desired temperature
 - This helps the system filter appropriate clothing items
-
+![alt text](<../Screenshots/Screenshot 2026-04-14 at 5.52.01 PM.png>)
 ---
 
 ### Step 4: Generate Outfits
@@ -47,7 +47,7 @@ https://huecloset.netlify.app/
   - Extract dominant colors from each clothing item
   - Filter items based on temperature suitability
   - Rank outfit combinations based on color compatibility
-
+![alt text](<../Screenshots/Screenshot 2026-04-14 at 5.52.49 PM.png>)
 ---
 
 ### Step 5: View Results
@@ -56,7 +56,7 @@ https://huecloset.netlify.app/
   - Selected clothing items
   - A score indicating quality
   - A brief explanation (color harmony + weather suitability)
-
+![alt text](<../Screenshots/Screenshot 2026-04-14 at 5.52.39 PM.png>)
 ---
 
 ## Example Workflow

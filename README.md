@@ -1,178 +1,192 @@
-# Research Prototype: Intelligent Outfit Recommendation System
+# Research Prototype: Intelligent Outfit Recommendation System (HueCloset)
 
 ## Overview
-This project is a research prototype developed for Junior Seminar. The goal of the system is to generate outfit recommendations based on **color compatibility** and **temperature conditions**. It combines image processing, rule-based filtering, and scoring techniques to produce aesthetically coherent and weather-appropriate outfits.
+HueCloset is a research prototype that generates outfit recommendations based on **color harmony** and **environmental temperature conditions**. The system combines computer vision techniques, rule-based decision making, and scoring logic to produce aesthetically coherent and weather-appropriate outfit suggestions.
 
-This prototype supports experimentation on:
-- Color harmony and dominant color extraction
-- Climate-based clothing selection
-- Algorithmic outfit scoring
+This prototype is designed as an experimental system for studying how computational methods can support visual aesthetic decision-making in fashion contexts.
 
 ---
 
 ## Research Problem
-Choosing outfits that are both visually cohesive and appropriate for weather conditions is a complex task. This project explores how computational methods can:
-- Extract meaningful features from clothing images  
-- Apply constraints based on environmental data  
-- Rank outfit combinations using aesthetic principles  
+Selecting outfits involves balancing **visual compatibility (color harmony)** and **contextual appropriateness (weather conditions)**. This project investigates whether computational methods can approximate this decision-making process.
+
+The system explores:
+- How dominant color extraction can represent clothing items
+- How environmental constraints (temperature) influence selection
+- How rule-based scoring can approximate aesthetic judgment
+
+---
+
+## System Pipeline
+
+User Input (Images + Temperature)
+        ↓
+Dominant Color Extraction (RGB analysis)
+        ↓
+Climate-Based Filtering (temperature constraints)
+        ↓
+Outfit Combination Generation
+        ↓
+Aesthetic Scoring (color harmony rules)
+        ↓
+Ranked Outfit Output
 
 ---
 
 ## Features
-- Dominant color extraction from clothing images  
-- Temperature-based filtering system  
-- Outfit scoring based on color compatibility  
-- Modular design for testing subsystems independently  
+- Automated dominant color extraction from clothing images  
+- Temperature-based filtering of clothing items  
+- Rule-based outfit scoring system  
+- Ranked outfit generation with explanations  
+- Modular pipeline design for independent subsystem testing  
 
 ---
 
-## Installation Instructions
+## How to Use the System
 
-### Prerequisites
-Make sure you have the following installed:
-- Python 3.9+
-- pip (Python package manager)
+### Step 1: Access the Application
+Open the deployed application in your browser:
 
-### Step-by-Step Setup
-
-1. Clone the repository:
-```bash
-git clone https://github.com/your-username/your-repo-name.git
-cd your-repo-name
-```
-
-2. Create a virtual environment:
-```bash
-python -m venv venv
-source venv/bin/activate  # Mac/Linux
-venv\Scripts\activate     # Windows
-```
-
-3. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-4. Run the prototype:
-```bash
-python main.py
-```
+https://huecloset.netlify.app/
 
 ---
 
-## Usage
-
-### Basic Example
-1. Add clothing images to the `data/` folder  
-2. Run the system:
-```bash
-python main.py
-```
-3. The program will:
-   - Extract dominant colors  
-   - Filter items based on temperature  
-   - Generate and rank outfit combinations  
-
-### Expected Output
-- Ranked list of outfit combinations  
-- Color and temperature justification for each recommendation  
+### Step 2: Upload Clothing Items
+- Upload images of clothing items (e.g., shirts, pants, jackets)
+- Supported formats: .jpg, .png, .webp
+- Multiple items are recommended for best results
 
 ---
 
-## Example
+### Step 3: Enter Temperature
+- Input a numeric temperature value (°F)
+- Example: 65
+
+---
+
+### Step 4: Generate Outfit
+- Click the “Generate” button
+- The system processes inputs through the pipeline:
+  - Extracts dominant colors
+  - Filters items based on temperature
+  - Computes outfit compatibility scores
+  - Ranks possible combinations
+
+---
+
+### Step 5: Interpret Results
+- Ranked outfit combinations
+- A score representing aesthetic + contextual fit
+- A short explanation of the recommendation
+
+---
+
+## Example Execution
 
 Input:
+- Clothing items: shirt, pants, jacket  
 - Temperature: 65°F  
-- Clothing images: shirt, pants, jacket  
 
 Output:
-```
-Top Outfit:
+Top Outfit Recommendation:
 - Blue shirt
 - Beige pants
 - Light jacket
 
 Score: 0.87
-Reason: Complementary color palette + appropriate for mild weather
-```
+
+Explanation:
+This outfit combines complementary colors and is suitable for mild weather conditions.
 
 ---
 
-## Project Structure
-```
-├── data/                # Input clothing images
-├── src/                 # Source code
-│   ├── color_extraction.py
-│   ├── climate_filter.py
-│   ├── scoring.py
-│   └── main.py
-├── tests/               # Test cases
-├── requirements.txt     # Dependencies
-└── README.md
-```
+## Research-to-System Mapping
+
+Research Concept              | System Component
+----------------------------|----------------------------
+Color harmony evaluation     | Dominant color extraction
+Weather suitability          | Climate filtering module
+Outfit decision modeling     | Scoring system
+Recommendation generation    | Combination engine
 
 ---
 
-## Technical Details
-- **Color Extraction:** Uses RGB quantization to determine dominant colors  
-- **Climate Filtering:** Rule-based thresholds for temperature ranges  
-- **Scoring System:** Combines color harmony and contextual constraints  
+## Error Handling & Validation
+- Rejects unsupported or invalid image files  
+- Handles missing or empty wardrobe inputs  
+- Validates temperature input (must be numeric)  
+- Prevents execution when insufficient data is provided  
+- Displays fallback behavior when no valid outfits can be generated  
 
 ---
 
-## Error Handling
-The system includes:
-- Validation for missing or invalid image inputs  
-- Graceful handling of empty datasets  
-- Input checks for temperature values  
+## Experimental Design
+- Different temperature conditions (cold, mild, hot)
+- Different clothing combinations and color distributions
+- Repeated runs to test consistency of scoring outputs
+- Observation of ranking stability across inputs
+
+---
+
+## Technical Architecture
+- Frontend/UI: Web-based interface (Netlify deployment)
+- Image Processing: RGB-based dominant color extraction
+- Filtering Logic: Rule-based temperature constraints
+- Scoring Engine: Color compatibility heuristics
+- Output System: Ranked recommendation generation
 
 ---
 
 ## Development Practices
-- Modular code structure for maintainability  
-- Meaningful commit messages  
-- Version control using Git  
-- Separation of concerns across subsystems  
+- Modular code structure separating extraction, filtering, and scoring logic  
+- Clear separation of concerns across system components  
+- Reusable functions for core processing tasks  
+- Consistent naming conventions  
+- Version control using Git with iterative development history  
 
 ---
 
-## Testing
-Run tests using:
-```bash
-pytest
-```
-
-Tests include:
-- Color extraction accuracy  
-- Boundary condition testing for temperature  
-- Scoring consistency  
+## Reproducibility
+This project can be fully reproduced by:
+1. Cloning the repository  
+2. Installing dependencies from requirements.txt  
+3. Running the application locally or using the deployed Netlify link  
 
 ---
 
 ## Limitations
-- Limited dataset size  
-- Rule-based approach may not generalize to all fashion contexts  
-- No machine learning integration (future work)  
+- Rule-based system does not use machine learning  
+- Limited dataset of clothing images  
+- Aesthetic evaluation is heuristic-based  
+- Performance depends on input quality  
 
 ---
 
 ## Future Work
-- Integrate machine learning for improved recommendations  
-- Expand dataset for broader testing  
-- Add user interface for easier interaction  
+- Machine learning-based recommendations  
+- Larger dataset expansion  
+- User personalization  
+- Improved UI/UX  
+- Human evaluation studies  
 
 ---
 
-## Contribution
-This is an academic research prototype. Contributions are not required but feedback is welcome.
+## Example Workflow
+1. Upload clothing items  
+2. Enter temperature  
+3. Extract dominant colors  
+4. Filter by weather  
+5. Generate combinations  
+6. Rank outfits  
+7. Display recommendation  
 
 ---
 
 ## Author
 Veronica McNeece  
-Computer Science, Junior Seminar  
+Computer Science – Junior Seminar  
 
 ---
 
 ## License
-This project is for academic use only.
+Academic use only.

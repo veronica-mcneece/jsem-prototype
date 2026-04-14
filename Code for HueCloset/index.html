@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Wardrobe Matchmaker AI</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <div class="app-container">
+
+    <header>
+      <h1>🎀 Wardrobe Matchmaker AI</h1>
+      <p class="subtitle">
+        AI-driven color harmony, aesthetic intelligence, and climate awareness.
+      </p>
+    </header>
+
+    <!-- ADD GARMENT -->
+    <section class="card">
+      <h2>Add Garment</h2>
+
+      <input type="file" id="imageInput" accept="image/*" />
+
+      <select id="garmentTypeSelect">
+        <option value="top">Top</option>
+        <option value="bottom">Bottom</option>
+        <option value="outerwear">Outerwear</option>
+        <option value="shoes">Shoes</option>
+      </select>
+
+      <button id="addButton">Add</button>
+    </section>
+
+    <!-- ENVIRONMENT -->
+    <section class="card">
+      <h2>Environment</h2>
+
+      <input type="number" id="temperatureInput" placeholder="Temperature °F" />
+
+      <select id="aestheticMode">
+        <option value="balanced">Balanced</option>
+        <option value="minimalist">Minimalist</option>
+        <option value="bold">Bold</option>
+        <option value="neutral">Neutral</option>
+      </select>
+    </section>
+
+    <!-- WARDROBE -->
+    <section class="card">
+      <h2>Your Wardrobe</h2>
+      <div id="wardrobeDisplay" class="wardrobe-grid"></div>
+    </section>
+
+    <!-- GENERATE -->
+    <section class="card">
+      <h2>Generate Outfit</h2>
+
+      <button id="pairButton">Generate Look</button>
+
+      <div id="pairingResult"></div>
+
+      <div class="meter-container">
+        <div>
+          Harmony
+          <div class="meter"><div id="harmonyMeter"></div></div>
+        </div>
+
+        <div>
+          Contrast
+          <div class="meter"><div id="contrastMeter"></div></div>
+        </div>
+
+        <div>
+          Temperature Fit
+          <div class="meter"><div id="climateMeter"></div></div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ✅ LINK YOUR REAL LOGIC -->
+  <script src="script.js"></script>
+
+</body>
+</html>

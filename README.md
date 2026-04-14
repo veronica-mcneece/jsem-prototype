@@ -190,3 +190,4 @@ Computer Science – Junior Seminar
 
 ## License
 Academic use only.
+Copyright (c) 2026 Veronica McNeece. This project is for academic purposes as part of the Allegheny College Junior Seminar. All rights reserved.

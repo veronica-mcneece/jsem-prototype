@@ -56,4 +56,4 @@ This document explicitly connects the **HueCloset** source code and prototype fu
 ---
 
 ## Conclusion
-The HueCloset prototype is not merely a standalone application but a functional validation of the research conducted throughout the Spring 2026 semester. It effectively balances technical challenge with the feasibility requirements of a junior-level research project.
+The HueCloset prototype is not merely a standalone application but a functional validation of the research conducted throughout the Spring 2026 semester. Experimental results from Chapter 4 confirm that each subsystem performs within acceptable thresholds, with documented limitations that ground the project's claims in honest empirical analysis. The prototype effectively balances technical challenge with the feasibility requirements of a junior-level research project.Share
